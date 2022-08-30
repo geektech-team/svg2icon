@@ -1,0 +1,33 @@
+{
+  "name": "svg2icon",
+  "description": "Svg to icon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geektech-team/svg2icon.git"
+  },
+  "keywords": [
+    "svg2icon",
+    "font"
+  ],
+  "author": "Jimmie Max",
+  "devDependencies": {
+    "fs-extra": "^10.1.0",
+    "svgicons2svgfont": "^12.0.0",
+    "ejs": "^3.1.8",
+    "svg2ttf": "^6.0.3",
+    "ttf2eot": "^3.1.0",
+    "ttf2woff": "^3.0.0",
+    "ttf2woff2": "^4.0.5"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/geektech-team/svg2icon/issues"
+  },
+  "homepage": "https://github.com/geektech-team/svg2icon#readme"
+}
