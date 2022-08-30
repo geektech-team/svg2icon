@@ -2,11 +2,11 @@ const ejs = require("ejs");
 const path = require("path");
 const fs = require("fs");
 const fextra = require("fs-extra");
-const SVGTOFONT = require("svgicons2svgfont");
-const SVGTOTTF = require("svg2ttf");
-const SVGTOWOFF = require("ttf2woff");
-const SVGTOWOFFTWO = require("ttf2woff2");
-const SVGTOEOT = require("ttf2eot");
+const SvgToFont = require("svgicons2svgfont");
+const SvgToTtf = require("svg2ttf");
+const TtfToWoff = require("ttf2woff");
+const TtfToWoff2 = require("ttf2woff2");
+const TtfToEot = require("ttf2eot");
 
 const DIST_TTF = path.resolve(process.cwd(), "./font/iconfont.ttf");
 const DIST_WOFF = path.resolve(process.cwd(), "./font/iconfont.woff");
@@ -16,7 +16,7 @@ let iconList = [];
 
 const generateIconfont = () => {
   return new Promise((resolve) => {
-    const iconFontStream = new SVGTOFONT({
+    const iconFontStream = new SvgToFont({
       fontName: "iconfont",
       fontHeight: 1024,
       metadata: "TOM",
@@ -57,7 +57,8 @@ const generateIconfont = () => {
           name: svgFileName,
         };
         const [iconUnicode] = item[svgFileName]["metadata"]["unicode"];
-        iconList.push({[svgFileName]: iconUnicode, name: svgFileName, unicode: `&#${iconUnicode.charCodeAt(0)};`})
+        const codeValue = iconUnicode.charCodeAt(0);
+        iconList.push({[svgFileName]: iconUnicode, name: svgFileName, unicode: `&#${codeValue};`, classContent: parseInt(codeValue).toString(16)})
         return item;
       });
 
@@ -75,7 +76,7 @@ const generateIconfont = () => {
 /** 生成TTF文件 **/
 const generateIconTTF = async () => {
   return new Promise(async (resolve, reject) => {
-    let iconttf = SVGTOTTF(
+    let iconttf = SvgToTtf(
       await fextra.readFileSync(
         path.join(__dirname, "font/iconfont.svg"),
         "utf-8"
@@ -96,7 +97,7 @@ const generateIconTTF = async () => {
 /** 生成WOFF文件 **/
 const generateIconWoff = () => {
   return new Promise(async (resolve, reject) => {
-    let iconwoff = SVGTOWOFF(await fextra.readFileSync(DIST_TTF));
+    let iconwoff = TtfToWoff(await fextra.readFileSync(DIST_TTF));
     fextra.writeFileSync(
       DIST_WOFF,
       new Buffer.from(iconwoff.buffer),
@@ -115,7 +116,7 @@ const generateIconWoff = () => {
 /** 生成WOFF2文件 **/
 const generateIconWoffTwo = () => {
   return new Promise((resolve) => {
-    let iconwoff2 = SVGTOWOFFTWO(fextra.readFileSync(DIST_TTF));
+    let iconwoff2 = TtfToWoff2(fextra.readFileSync(DIST_TTF));
     fextra.writeFileSync(
       DIST_WOFF_TWO,
       new Buffer.from(iconwoff2.buffer),
@@ -132,7 +133,7 @@ const generateIconWoffTwo = () => {
 const generateIconEot = () => {
   // const DIST_EOT = path.resolve(process.cwd(), "./font/iconfont.eot")
   return new Promise((resolve) => {
-    let iconeot = SVGTOEOT(fextra.readFileSync(DIST_TTF));
+    let iconeot = TtfToEot(fextra.readFileSync(DIST_TTF));
     fextra.writeFileSync(
       DIST_EOT,
       new Buffer.from(iconeot.buffer),
