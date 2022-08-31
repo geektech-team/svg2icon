@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-
+const fs = require("fs");
+const path = require("path");
 const svg2icon = require('../src/index.js')
 
 const defaultOptions = {

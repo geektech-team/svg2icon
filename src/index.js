@@ -46,7 +46,11 @@ function create(options) {
       Object.keys(UnicodeObject).forEach((name) => {
         let _code = UnicodeObject[name];
         cssIconHtml.push(
-          `<li class="class-icon"><i class="${options.classNamePrefix}-${name}"></i><p class="name">${options.classNamePrefix}-${name}</p></li>`
+          `<li class="class-icon">
+            <i class="${options.classNamePrefix}-${name}"></i>
+            <p class="name">${options.classNamePrefix}-${name}</p>
+            <code>&lt;i class="${options.classNamePrefix}-${name}"&gt;&lt;/i&gt;</code>
+          </li>`
         );
         cssString.push(
           `.${options.classNamePrefix}-${name}:before { content: "\\${_code

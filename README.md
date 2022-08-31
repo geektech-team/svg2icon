@@ -17,7 +17,9 @@ module.exports = {
   classNamePrefix: "geekicon", // class name prefix （class前缀）
 }
 ```
-run
+Makge dir 'svg' in your project and put in svg files;
+
+Run
 ```bash
 svg2icon
 ```

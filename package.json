@@ -1,7 +1,7 @@
 {
   "name": "@geektech/svg2icon",
   "description": "Svg to icon",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "src/index.js",
   "bin": {
     "svg2icon": "bin/index.js"
@@ -18,7 +18,7 @@
     "font"
   ],
   "author": "Jimmie Max",
-  "devDependencies": {
+  "dependencies": {
     "copy-template-dir": "^1.4.0",
     "ejs": "^3.1.8",
     "fs-extra": "^10.1.0",
