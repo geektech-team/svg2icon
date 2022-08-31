@@ -1,12 +1,9 @@
 const svgtoiconfont = require("./src");
 const path = require("path");
-const rootPath = path.resolve(process.cwd(), "test");
  
 svgtoiconfont({
-  dist: path.resolve(rootPath, "dist"), // output path(输出文件路径)
-  src: path.resolve("svg"), // svg path(svg资源路径)
-  fontName: "icomoon", // font name （字体名称）
-  classNamePrefix: "icon", // class name prefix （class前缀）
-}).then(() => {
-  console.log('done!');
+  dist: "dist", // output path(输出文件路径)
+  src: "svg", // svg path(svg资源路径)
+  fontName: "geek-icon", // font name （字体名称）
+  classNamePrefix: "geekicon", // class name prefix （class前缀）
 });

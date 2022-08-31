@@ -8,6 +8,7 @@ const {
   createTTF,
   createEOT,
   createWOFF,
+  createWOFF2,
   createHTML,
   copyTemplate
 } = require("./utils");
@@ -60,6 +61,7 @@ module.exports = function create(options) {
     .then(() => createTTF(options))
     .then(() => createEOT(options))
     .then(() => createWOFF(options))
+    .then(() => createWOFF2(options))
     .then(() => {
       const font_temp = path.resolve(__dirname, "styles");
       return copyTemplate(font_temp, options.dist, {
@@ -75,7 +77,7 @@ module.exports = function create(options) {
       filePaths &&
         filePaths.length > 0 &&
         filePaths.forEach(filePath =>
-          console.log(`${"SUCCESS".green} Created ${filePath} `)
+          console.log(`Created ${filePath} `)
         );
     })
     .then(() => {
@@ -100,7 +102,7 @@ module.exports = function create(options) {
           // minify(str, { collapseWhitespace: true, minifyCSS: true })
           str
         );
-        console.log(`${"SUCCESS".green} Created ${fontClassPath} `);
+        console.log(`Created ${fontClassPath} `);
       }
     });
 };

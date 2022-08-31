@@ -6,6 +6,7 @@ const copy = require("copy-template-dir");
 const ttf2eot = require('ttf2eot');
 const svg2ttf = require("svg2ttf");
 const ttf2woff = require("ttf2woff");
+const ttf2woff2 = require("ttf2woff2");
 // require("colors-cli/toxic");
 
 let UnicodeObj = {};
@@ -62,7 +63,7 @@ exports.createSVG = OPTIONS => {
     const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".svg");
     // Setting the font destination
     fontStream.pipe(fs.createWriteStream(DIST_PATH)).on("finish", () => {
-      console.log(`${"SUCCESS".green} ${'SVG'.blue_bt} font successfully created! ${DIST_PATH}`);
+      console.log(`SVG font successfully created! ${DIST_PATH}`);
       resolve(UnicodeObj);
     }).on("error", (err) => {
       if (err) {
@@ -94,7 +95,7 @@ exports.createTTF = OPTIONS => {
       if (err) {
         return reject(err);
       }
-      console.log(`${"SUCCESS".green} ${"TTF".blue_bt} font successfully created! ${DIST_PATH}`);
+      console.log(`TTF font successfully created! ${DIST_PATH}`);
       resolve(data);
     });
   });
@@ -113,7 +114,7 @@ exports.createEOT = OPTIONS => {
       if (err) {
         return reject(err);
       }
-      console.log(`${"SUCCESS".green} ${"EOT".blue_bt} font successfully created! ${DIST_PATH}`);
+      console.log(`EOT font successfully created! ${DIST_PATH}`);
       resolve(data);
     });
   });
@@ -131,7 +132,25 @@ exports.createWOFF = OPTIONS => {
       if (err) {
         return reject(err);
       }
-      console.log(`${"SUCCESS".green} ${"WOFF".blue_bt} font successfully created! ${DIST_PATH}`);
+      console.log(`WOFF font successfully created! ${DIST_PATH}`);
+      resolve(data);
+    });
+  });
+};
+
+/**
+ * TTF font to WOFF2
+ */
+exports.createWOFF2 = OPTIONS => {
+  return new Promise((resolve, reject) => {
+    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".woff2");
+    // const woff = new Buffer(ttf2woff(this.ttf).buffer);
+    const woff = new Buffer.from(ttf2woff2(this.ttf).buffer);
+    fs.writeFile(DIST_PATH, woff, (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(`WOFF2 font successfully created! ${DIST_PATH}`);
       resolve(data);
     });
   });
