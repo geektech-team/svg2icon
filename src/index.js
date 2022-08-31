@@ -1,4 +1,3 @@
-const _fs = require("fs");
 const fs = require("fs-extra");
 const path = require("path");
 // const minify = require("html-minifier").minify;
@@ -10,10 +9,10 @@ const {
   createWOFF,
   createWOFF2,
   createHTML,
-  copyTemplate
+  copyTemplate,
 } = require("./utils");
 
-module.exports = function create(options) {
+function create(options) {
   if (!options) options = {};
   // 输出文件路径
   options.dist = options.dist || path.join(process.cwd(), "dist");
@@ -24,9 +23,9 @@ module.exports = function create(options) {
   // 输出的字体包文件路径
   options.fontsDist = path.join(options.dist, options.fontsDistName);
   // 生成的图标字体的字体名称
-  options.fontName = options.fontName || "e6-icon";
+  options.fontName = options.fontName || "icon";
   // 生成图标字体前缀
-  options.classNamePrefix = options.classNamePrefix || "e6-icon";
+  options.classNamePrefix = options.classNamePrefix || "icon";
 
   options.unicodeStart = options.unicodeStart || 10000;
   options.svg2ttf = options.svg2ttf || {};
@@ -43,16 +42,14 @@ module.exports = function create(options) {
   let fontClassPath = path.join(options.dist, "index.html");
 
   return createSVG(options)
-    .then(UnicodeObject => {
-      Object.keys(UnicodeObject).forEach(name => {
+    .then((UnicodeObject) => {
+      Object.keys(UnicodeObject).forEach((name) => {
         let _code = UnicodeObject[name];
         cssIconHtml.push(
           `<li class="class-icon"><i class="${options.classNamePrefix}-${name}"></i><p class="name">${options.classNamePrefix}-${name}</p></li>`
         );
         cssString.push(
-          `.${
-            options.classNamePrefix
-          }-${name}:before { content: "\\${_code
+          `.${options.classNamePrefix}-${name}:before { content: "\\${_code
             .charCodeAt(0)
             .toString(16)}"; }\n`
         );
@@ -69,16 +66,14 @@ module.exports = function create(options) {
         fontsDistName: options.fontsDistName,
         cssString: cssString.join(""),
         timestamp: new Date().getTime(),
-        prefix: options.classNamePrefix
+        prefix: options.classNamePrefix,
       });
     })
-    .then(filePaths => {
+    .then((filePaths) => {
       // output log
       filePaths &&
         filePaths.length > 0 &&
-        filePaths.forEach(filePath =>
-          console.log(`Created ${filePath} `)
-        );
+        filePaths.forEach((filePath) => console.log(`Created ${filePath} `));
     })
     .then(() => {
       // default template
@@ -87,15 +82,15 @@ module.exports = function create(options) {
       this.tempData = {
         ...options.website,
         _link: `icon.css`,
-        _IconHtml: cssIconHtml.join("")
+        _IconHtml: cssIconHtml.join(""),
       };
       return createHTML({
         outPath: options.website.template,
-        data: this.tempData
+        data: this.tempData,
       });
       // }
     })
-    .then(str => {
+    .then((str) => {
       if (options.website) {
         fs.outputFileSync(
           fontClassPath,
@@ -105,4 +100,6 @@ module.exports = function create(options) {
         console.log(`Created ${fontClassPath} `);
       }
     });
-};
+}
+
+module.exports = create;

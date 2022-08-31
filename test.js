@@ -1,5 +1,4 @@
 const svgtoiconfont = require("./src");
-const path = require("path");
  
 svgtoiconfont({
   dist: "dist", // output path(输出文件路径)
