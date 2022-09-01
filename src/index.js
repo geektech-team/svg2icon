@@ -49,7 +49,6 @@ function create(options) {
           `<li class="class-icon">
             <i class="${options.classNamePrefix}-${name}"></i>
             <p class="name">${options.classNamePrefix}-${name}</p>
-            <code>&lt;i class="${options.classNamePrefix}-${name}"&gt;&lt;/i&gt;</code>
           </li>`
         );
         cssString.push(
