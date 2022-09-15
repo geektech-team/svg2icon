@@ -1,27 +1,10 @@
 const fs = require("fs");
 const path = require("path");
-const ejs = require("ejs");
 const SVGIcons2SVGFont = require("svgicons2svgfont");
-const copy = require("copy-template-dir");
 const ttf2eot = require("ttf2eot");
 const svg2ttf = require("svg2ttf");
 const ttf2woff = require("ttf2woff");
 const ttf2woff2 = require("ttf2woff2");
-
-let UnicodeObj = {};
-// Unicode Private Use Area start.
-// https://en.wikipedia.org/wiki/Private_Use_Areas
-let startUnicode = 0xea01;
-
-/*
- * Get icon unicode
- * @return {Array} unicode array
- */
-function getIconUnicode(name) {
-  let unicode = String.fromCharCode(startUnicode++);
-  UnicodeObj[name] = unicode;
-  return [unicode];
-}
 /*
  * Filter svg files
  * @return {Array} svg files
@@ -42,31 +25,27 @@ function filterSvgFiles(svgFolderPath) {
   }
   return svgArr;
 }
+
 /**
  * SVG to SVG font
  */
-exports.createSVG = (OPTIONS) => {
-  number = OPTIONS.unicodeStart;
+exports.createSVG = (options) => {
   return new Promise((resolve, reject) => {
     // init
+    let {
+      UnicodeObject,
+      startUnicode
+    } = options;
     const fontStream = new SVGIcons2SVGFont({
-      ...OPTIONS.svgicons2svgfont,
+      ...options.svgicons2svgfont,
     });
-    function writeFontStream(svgPath) {
-      // file name
-      let _name = path.basename(svgPath, ".svg");
-      const glyph = fs.createReadStream(svgPath);
-      glyph.metadata = { unicode: getIconUnicode(_name), name: _name };
-      fontStream.write(glyph);
-    }
-
-    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".svg");
+    const DIST_PATH = path.join(options.fontsDist, options.fontName + ".svg");
     // Setting the font destination
     fontStream
       .pipe(fs.createWriteStream(DIST_PATH))
       .on("finish", () => {
         console.log(`SVG font successfully created! ${DIST_PATH}`);
-        resolve(UnicodeObj);
+        resolve(options);
       })
       .on("error", (err) => {
         if (err) {
@@ -74,37 +53,75 @@ exports.createSVG = (OPTIONS) => {
           reject(err);
         }
       });
-    filterSvgFiles(OPTIONS.src).forEach((svg) => {
-      if (typeof svg !== "string") return false;
-      writeFontStream(svg);
+    filterSvgFiles(options.src).forEach((svgPath) => {
+      if (typeof svgPath !== "string") return false;
+      // 写入文件
+      let _name = path.basename(svgPath, ".svg");
+      const glyph = fs.createReadStream(svgPath);
+      const unicode = String.fromCharCode(startUnicode++);
+      UnicodeObject[_name] = unicode;
+      glyph.metadata = {
+        unicode: [unicode],
+        name: _name
+      };
+      fontStream.write(glyph);
     });
-
     // Do not forget to end the stream
     fontStream.end();
   });
 };
 
 /**
+ * 创建代码块
+ * @param {*} options 
+ * @returns 
+ */
+exports.createIconBlocks = (options) => {
+  return new Promise((resolve, reject) => {
+    const {
+      cssString,
+      cssIconHtml,
+      classNamePrefix,
+      UnicodeObject
+    } = options;
+    Object.keys(UnicodeObject).forEach((name) => {
+      let _code = UnicodeObject[name];
+      cssIconHtml.push(
+        `<li class="class-icon">
+          <i class="${classNamePrefix}-${name}"></i>
+          <p class="name">${classNamePrefix}-${name}</p>
+        </li>`
+      );
+      cssString.push(
+        `.${classNamePrefix}-${name}:before { content: "\\${_code
+          .charCodeAt(0)
+          .toString(16)}"; }\n`
+      );
+    });
+    resolve(options)
+  })
+}
+
+/**
  * SVG font to TTF
  */
-exports.createTTF = (OPTIONS) => {
+exports.createTTF = (options) => {
   return new Promise((resolve, reject) => {
-    OPTIONS.svg2ttf = OPTIONS.svg2ttf || {};
-    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".ttf");
+    options.svg2ttf = options.svg2ttf || {};
+    const DIST_PATH = path.join(options.fontsDist, options.fontName + ".ttf");
     let ttf = svg2ttf(
       fs.readFileSync(
-        path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".svg"),
+        path.join(options.fontsDist, options.fontName + ".svg"),
         "utf8"
       ),
-      OPTIONS.svg2ttf
+      options.svg2ttf
     );
     ttf = this.ttf = new Buffer.from(ttf.buffer);
-    if (OPTIONS.linkMode === 'inline') OPTIONS.ttfBase64 = `data:font/ttf;base64,${ttf.toString("base64")}`;
+    if (options.linkMode === 'inline') options.ttfBase64 = `data:font/ttf;base64,${ttf.toString("base64")}`;
     fs.writeFile(DIST_PATH, ttf, (err, data) => {
       if (err) {
         return reject(err);
       }
-      var bitmap = fs.readFileSync(DIST_PATH, "utf8");
       console.log(`TTF font successfully created! ${DIST_PATH}`);
       resolve(data);
     });
@@ -114,9 +131,9 @@ exports.createTTF = (OPTIONS) => {
 /**
  * TTF font to EOT
  */
-exports.createEOT = (OPTIONS) => {
+exports.createEOT = (options) => {
   return new Promise((resolve, reject) => {
-    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".eot");
+    const DIST_PATH = path.join(options.fontsDist, options.fontName + ".eot");
     const eot = new Buffer.from(ttf2eot(this.ttf).buffer);
     fs.writeFile(DIST_PATH, eot, (err, data) => {
       if (err) {
@@ -131,11 +148,11 @@ exports.createEOT = (OPTIONS) => {
 /**
  * TTF font to WOFF
  */
-exports.createWOFF = (OPTIONS) => {
+exports.createWOFF = (options) => {
   return new Promise((resolve, reject) => {
-    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".woff");
+    const DIST_PATH = path.join(options.fontsDist, options.fontName + ".woff");
     const woff = new Buffer.from(ttf2woff(this.ttf).buffer);
-    if (OPTIONS.linkMode === 'inline') OPTIONS.woffBase64 = `data:font/woff;base64,${woff.toString("base64")}`;
+    if (options.linkMode === 'inline') options.woffBase64 = `data:font/woff;base64,${woff.toString("base64")}`;
     fs.writeFile(DIST_PATH, woff, (err, data) => {
       if (err) {
         return reject(err);
@@ -149,11 +166,11 @@ exports.createWOFF = (OPTIONS) => {
 /**
  * TTF font to WOFF2
  */
-exports.createWOFF2 = (OPTIONS) => {
+exports.createWOFF2 = (options) => {
   return new Promise((resolve, reject) => {
-    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".woff2");
+    const DIST_PATH = path.join(options.fontsDist, options.fontName + ".woff2");
     const woff = new Buffer.from(ttf2woff2(this.ttf).buffer);
-    if (OPTIONS.linkMode === 'inline') OPTIONS.woff2Base64 = `data:font/woff2;base64,${woff.toString("base64")}`;
+    if (options.linkMode === 'inline') options.woff2Base64 = `data:font/woff2;base64,${woff.toString("base64")}`;
     fs.writeFile(DIST_PATH, woff, (err, data) => {
       if (err) {
         return reject(err);
@@ -165,13 +182,45 @@ exports.createWOFF2 = (OPTIONS) => {
 };
 
 /**
- * Copy template files
+ * Create CSS
  */
-exports.copyTemplate = (inDir, outDir, vars) => {
+exports.createCSS = (options) => {
   return new Promise((resolve, reject) => {
-    copy(inDir, outDir, vars, (err, createdFiles) => {
-      if (err) reject(err);
-      resolve(createdFiles);
+    const {
+      dist,
+      fontName,
+      fontsDistName,
+      classNamePrefix,
+      ext,
+      linkMode,
+      ttfBase64,
+      woffBase64,
+      woff2Base64,
+      cssString
+    } = options;
+    const timestamp = new Date().getTime();
+    let cssContent = fs.readFileSync(path.resolve(__dirname, `${linkMode === "inline" ? 'inline' : 'link'}-icon-font.css`), 'utf8');
+    cssContent = cssContent.replace(/{{fontname}}/g, fontName)
+      .replace(/{{fontsDistName}}/g, fontsDistName)
+      .replace(/{{classNamePrefix}}/g, classNamePrefix);
+    if (linkMode === "inline") {
+      cssContent = cssContent.replace(/{{ttfBase64}}/g, ttfBase64)
+        .replace(/{{woffBase64}}/g, woffBase64)
+        .replace(/{{woff2Base64}}/g, woff2Base64)
+    } else {
+      cssContent = cssContent.replace(/{{timestamp}}/g, timestamp)
+    }
+    cssContent = cssContent.replace(/{{cssString}}/, cssString.join(""));
+    if (ext !== 'css') {
+      fs.writeFileSync(path.join(dist, `${fontName}.css`), cssContent)
+    }
+    const DIST_PATH = path.join(dist, `${fontName}.${ext}`);
+    fs.writeFile(DIST_PATH, cssContent, (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(`Icon Font CSS successfully created! ${DIST_PATH}`);
+      resolve(data);
     });
   });
 };
@@ -179,11 +228,23 @@ exports.copyTemplate = (inDir, outDir, vars) => {
 /**
  * Create HTML
  */
-exports.createHTML = ({ outPath, data = {}, options = {} }) => {
+exports.createHTML = (options) => {
   return new Promise((resolve, reject) => {
-    ejs.renderFile(outPath, data, options, (err, str) => {
-      if (err) reject(err);
-      resolve(str);
+    const {
+      dist,
+      fontName,
+      cssIconHtml
+    } = options;
+    let htmlContent = fs.readFileSync(path.resolve(__dirname, `preview.html`), 'utf8');
+    htmlContent = htmlContent.replace(/{{link}}/, `${fontName}.css`)
+      .replace(/{{iconHtml}}/, cssIconHtml.join(""))
+    const DIST_PATH = path.join(dist, 'preview.html');
+    fs.writeFile(DIST_PATH, htmlContent, (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(`Preview HTML successfully created! ${DIST_PATH}`);
+      resolve(data);
     });
   });
 };

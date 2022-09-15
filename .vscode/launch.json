@@ -20,7 +20,7 @@
             "console": "integratedTerminal",
             "runtimeArgs": [
             ],
-            "runtimeExecutable": "node",
+            "runtimeExecutable": "node test",
             "skipFiles": [
                 "<node_internals>/**"
             ],

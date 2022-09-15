@@ -2,12 +2,13 @@ const fs = require("fs-extra");
 const path = require("path");
 const {
   createSVG,
+  createIconBlocks,
   createTTF,
   createEOT,
   createWOFF,
   createWOFF2,
+  createCSS,
   createHTML,
-  copyTemplate,
 } = require("./utils");
 
 function create(options) {
@@ -24,89 +25,33 @@ function create(options) {
   options.fontName = options.fontName || "icon";
   // 生成图标字体前缀
   options.classNamePrefix = options.classNamePrefix || "icon";
+  // 生成图标字体后缀
+  options.ext = options.ext || "css";
 
   options.unicodeStart = options.unicodeStart || 10000;
   options.svg2ttf = options.svg2ttf || {};
   options.emptyDist = options.emptyDist;
   options.svgicons2svgfont = options.svgicons2svgfont || {};
   options.svgicons2svgfont.fontName = options.fontName;
-  options.website = {};
+  options.UnicodeObject = {};
+  // Unicode Private Use Area start.
+  // https://en.wikipedia.org/wiki/Private_Use_Areas
+  options.startUnicode = 0xea01;
 
   fs.emptyDirSync(path.join(options.dist, options.fontsDistName));
   fs.emptyDirSync(options.fontsDist);
 
-  let cssString = [];
-  let cssIconHtml = [];
-  let fontClassPath = path.join(options.dist, "index.html");
+  options.cssString = [];
+  options.cssIconHtml = [];
 
   return createSVG(options)
-    .then((UnicodeObject) => {
-      Object.keys(UnicodeObject).forEach((name) => {
-        let _code = UnicodeObject[name];
-        cssIconHtml.push(
-          `<li class="class-icon">
-            <i class="${options.classNamePrefix}-${name}"></i>
-            <p class="name">${options.classNamePrefix}-${name}</p>
-          </li>`
-        );
-        cssString.push(
-          `.${options.classNamePrefix}-${name}:before { content: "\\${_code
-            .charCodeAt(0)
-            .toString(16)}"; }\n`
-        );
-      });
-    })
+    .then(() => createIconBlocks(options))
     .then(() => createTTF(options))
     .then(() => createEOT(options))
     .then(() => createWOFF(options))
     .then(() => createWOFF2(options))
-    .then(() => {
-      const font_temp = path.resolve(
-        __dirname,
-        `styles/${options.linkMode === "inline" ? "inline" : "link"}`
-      );
-      return copyTemplate(font_temp, options.dist, {
-        fontname: options.fontName,
-        fontsDistName: options.fontsDistName,
-        cssString: cssString.join(""),
-        timestamp: new Date().getTime(),
-        prefix: options.classNamePrefix,
-        ttf: options.ttfBase64,
-        woff: options.woffBase64,
-        woff2: options.woff2Base64,
-      });
-    })
-    .then((filePaths) => {
-      // output log
-      filePaths &&
-        filePaths.length > 0 &&
-        filePaths.forEach((filePath) => console.log(`Created ${filePath} `));
-    })
-    .then(() => {
-      // default template
-      options.website.template = path.join(__dirname, "template.ejs");
-      // template data
-      this.tempData = {
-        ...options.website,
-        _link: `icon-font.css`,
-        _IconHtml: cssIconHtml.join(""),
-      };
-      return createHTML({
-        outPath: options.website.template,
-        data: this.tempData,
-      });
-      // }
-    })
-    .then((str) => {
-      if (options.website) {
-        fs.outputFileSync(
-          fontClassPath,
-          // minify(str, { collapseWhitespace: true, minifyCSS: true })
-          str
-        );
-        console.log(`Created ${fontClassPath} `);
-      }
-    });
+    .then(() => createCSS(options))
+    .then(() => createHTML(options));
 }
 
 module.exports = create;
