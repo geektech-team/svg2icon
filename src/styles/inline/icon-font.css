@@ -2,7 +2,7 @@
   font-family: "{{fontname}}";
   src: url("{{woff}}") format("woff"),
   url("{{woff2}}") format("woff2"),
-  url("{{ttf}}") format("truetype"), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url("{{ttf}}") format("truetype"); /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
 }
   
 [class^="{{prefix}}-"], [class*=" {{prefix}}-"] {
@@ -15,7 +15,6 @@
   line-height: 1;
   vertical-align: baseline;
   display: inline-block;
-
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
