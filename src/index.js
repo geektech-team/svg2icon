@@ -1,7 +1,5 @@
 const fs = require("fs-extra");
 const path = require("path");
-// const minify = require("html-minifier").minify;
-// require("colors-cli/toxic");
 const {
   createSVG,
   createTTF,
@@ -63,13 +61,19 @@ function create(options) {
     .then(() => createWOFF(options))
     .then(() => createWOFF2(options))
     .then(() => {
-      const font_temp = path.resolve(__dirname, "styles");
+      const font_temp = path.resolve(
+        __dirname,
+        `styles/${options.linkMode === "inline" ? "inline" : "link"}`
+      );
       return copyTemplate(font_temp, options.dist, {
         fontname: options.fontName,
         fontsDistName: options.fontsDistName,
         cssString: cssString.join(""),
         timestamp: new Date().getTime(),
         prefix: options.classNamePrefix,
+        ttf: options.ttfBase64,
+        woff: options.woffBase64,
+        woff2: options.woff2Base64,
       });
     })
     .then((filePaths) => {
@@ -84,7 +88,7 @@ function create(options) {
       // template data
       this.tempData = {
         ...options.website,
-        _link: `icon.css`,
+        _link: `icon-font.css`,
         _IconHtml: cssIconHtml.join(""),
       };
       return createHTML({

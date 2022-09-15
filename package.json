@@ -1,13 +1,13 @@
 {
   "name": "@geektech/svg2icon",
   "description": "Svg to icon",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "main": "src/index.js",
   "bin": {
     "svg2icon": "bin/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test"
   },
   "repository": {
     "type": "git",

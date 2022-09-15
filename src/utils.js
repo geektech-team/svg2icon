@@ -3,7 +3,7 @@ const path = require("path");
 const ejs = require("ejs");
 const SVGIcons2SVGFont = require("svgicons2svgfont");
 const copy = require("copy-template-dir");
-const ttf2eot = require('ttf2eot');
+const ttf2eot = require("ttf2eot");
 const svg2ttf = require("svg2ttf");
 const ttf2woff = require("ttf2woff");
 const ttf2woff2 = require("ttf2woff2");
@@ -27,14 +27,15 @@ function getIconUnicode(name) {
  * @return {Array} svg files
  */
 function filterSvgFiles(svgFolderPath) {
-  let files = fs.readdirSync(svgFolderPath, 'utf-8');
+  let files = fs.readdirSync(svgFolderPath, "utf-8");
   let svgArr = [];
   if (!files) {
     throw new Error(`Error! Svg folder is empty.${svgFolderPath}`);
   }
 
   for (let i in files) {
-    if (typeof files[i] !== 'string' || path.extname(files[i]) !== '.svg') continue;
+    if (typeof files[i] !== "string" || path.extname(files[i]) !== ".svg")
+      continue;
     if (!~svgArr.indexOf(files[i])) {
       svgArr.push(path.join(svgFolderPath, files[i]));
     }
@@ -44,12 +45,12 @@ function filterSvgFiles(svgFolderPath) {
 /**
  * SVG to SVG font
  */
-exports.createSVG = OPTIONS => {
+exports.createSVG = (OPTIONS) => {
   number = OPTIONS.unicodeStart;
   return new Promise((resolve, reject) => {
     // init
     const fontStream = new SVGIcons2SVGFont({
-      ...OPTIONS.svgicons2svgfont
+      ...OPTIONS.svgicons2svgfont,
     });
     function writeFontStream(svgPath) {
       // file name
@@ -61,16 +62,19 @@ exports.createSVG = OPTIONS => {
 
     const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".svg");
     // Setting the font destination
-    fontStream.pipe(fs.createWriteStream(DIST_PATH)).on("finish", () => {
-      console.log(`SVG font successfully created! ${DIST_PATH}`);
-      resolve(UnicodeObj);
-    }).on("error", (err) => {
-      if (err) {
-        console.log(err);
-        reject(err);
-      }
-    });
-    filterSvgFiles(OPTIONS.src).forEach(svg => {
+    fontStream
+      .pipe(fs.createWriteStream(DIST_PATH))
+      .on("finish", () => {
+        console.log(`SVG font successfully created! ${DIST_PATH}`);
+        resolve(UnicodeObj);
+      })
+      .on("error", (err) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        }
+      });
+    filterSvgFiles(OPTIONS.src).forEach((svg) => {
       if (typeof svg !== "string") return false;
       writeFontStream(svg);
     });
@@ -83,16 +87,24 @@ exports.createSVG = OPTIONS => {
 /**
  * SVG font to TTF
  */
-exports.createTTF = OPTIONS => {
+exports.createTTF = (OPTIONS) => {
   return new Promise((resolve, reject) => {
     OPTIONS.svg2ttf = OPTIONS.svg2ttf || {};
     const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".ttf");
-    let ttf = svg2ttf(fs.readFileSync(path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".svg"), "utf8"), OPTIONS.svg2ttf);
+    let ttf = svg2ttf(
+      fs.readFileSync(
+        path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".svg"),
+        "utf8"
+      ),
+      OPTIONS.svg2ttf
+    );
     ttf = this.ttf = new Buffer.from(ttf.buffer);
+    if (OPTIONS.linkMode === 'inline') OPTIONS.ttfBase64 = `data:font/ttf;base64,${ttf.toString("base64")}`;
     fs.writeFile(DIST_PATH, ttf, (err, data) => {
       if (err) {
         return reject(err);
       }
+      var bitmap = fs.readFileSync(DIST_PATH, "utf8");
       console.log(`TTF font successfully created! ${DIST_PATH}`);
       resolve(data);
     });
@@ -102,9 +114,9 @@ exports.createTTF = OPTIONS => {
 /**
  * TTF font to EOT
  */
-exports.createEOT = OPTIONS => {
+exports.createEOT = (OPTIONS) => {
   return new Promise((resolve, reject) => {
-    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + '.eot');
+    const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".eot");
     const eot = new Buffer.from(ttf2eot(this.ttf).buffer);
     fs.writeFile(DIST_PATH, eot, (err, data) => {
       if (err) {
@@ -119,10 +131,11 @@ exports.createEOT = OPTIONS => {
 /**
  * TTF font to WOFF
  */
-exports.createWOFF = OPTIONS => {
+exports.createWOFF = (OPTIONS) => {
   return new Promise((resolve, reject) => {
     const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".woff");
     const woff = new Buffer.from(ttf2woff(this.ttf).buffer);
+    if (OPTIONS.linkMode === 'inline') OPTIONS.woffBase64 = `data:font/woff;base64,${woff.toString("base64")}`;
     fs.writeFile(DIST_PATH, woff, (err, data) => {
       if (err) {
         return reject(err);
@@ -136,10 +149,11 @@ exports.createWOFF = OPTIONS => {
 /**
  * TTF font to WOFF2
  */
-exports.createWOFF2 = OPTIONS => {
+exports.createWOFF2 = (OPTIONS) => {
   return new Promise((resolve, reject) => {
     const DIST_PATH = path.join(OPTIONS.fontsDist, OPTIONS.fontName + ".woff2");
     const woff = new Buffer.from(ttf2woff2(this.ttf).buffer);
+    if (OPTIONS.linkMode === 'inline') OPTIONS.woff2Base64 = `data:font/woff2;base64,${woff.toString("base64")}`;
     fs.writeFile(DIST_PATH, woff, (err, data) => {
       if (err) {
         return reject(err);
@@ -158,7 +172,7 @@ exports.copyTemplate = (inDir, outDir, vars) => {
     copy(inDir, outDir, vars, (err, createdFiles) => {
       if (err) reject(err);
       resolve(createdFiles);
-    })
+    });
   });
 };
 

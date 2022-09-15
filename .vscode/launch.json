@@ -12,19 +12,19 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/index.js"
-        }
-        // {
-        //     "name": "debug",
-        //     "request": "launch",
-        //     "type": "node",
-        //     "console": "integratedTerminal",
-        //     "runtimeArgs": [
-        //         "index",
-        //     ],
-        //     "runtimeExecutable": "node",
-        //     "skipFiles": [
-        //         "<node_internals>/**"
-        //     ],
-        // },
+        },
+        {
+            "name": "Test",
+            "request": "launch",
+            "type": "node",
+            "console": "integratedTerminal",
+            "runtimeArgs": [
+            ],
+            "runtimeExecutable": "node",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/test.js"
+        },
     ]
 }
