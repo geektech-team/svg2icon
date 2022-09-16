@@ -19,12 +19,13 @@
             "type": "node",
             "console": "integratedTerminal",
             "runtimeArgs": [
+                "run",
+                "test"
             ],
-            "runtimeExecutable": "node test",
+            "runtimeExecutable": "npm",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/test.js"
-        },
+        }
     ]
 }
