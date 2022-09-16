@@ -18,13 +18,13 @@ function create(options) {
   // svg资源文件路径
   options.src = options.src || path.join(process.cwd(), "svg");
   // 输出的字体包文件名称
-  options.fontsDistName = options.fontsDistName || "fonts";
+  options.fontsDistName = options.fontsDistName || "";
   // 输出的字体包文件路径
   options.fontsDist = path.join(options.dist, options.fontsDistName);
   // 生成的图标字体的字体名称
-  options.fontName = options.fontName || "icon";
+  options.fontName = options.fontName || "geek-icon";
   // 生成图标字体前缀
-  options.classNamePrefix = options.classNamePrefix || "icon";
+  options.classNamePrefix = options.classNamePrefix || "geekicon";
   // 生成图标字体后缀
   options.ext = options.ext || "css";
 
