@@ -6,5 +6,6 @@ svgtoiconfont({
   fontName: "geek-icon", // font name （字体名称）
   classNamePrefix: "geekicon", // class name prefix （class前缀）
   linkMode: 'link', // inline\link [default link]
+  fontsDistName: 'font', // inline\link [default link]
   ext: 'less' // 后缀名
 });

@@ -1,7 +1,7 @@
 {
   "name": "@geektech/svg2icon",
   "description": "Svg to icon",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "src/index.js",
   "bin": {
     "svg2icon": "bin/index.js"
