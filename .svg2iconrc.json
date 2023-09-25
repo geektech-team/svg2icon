@@ -1,0 +1,10 @@
+
+{
+  "dist": "dist", 
+  "src": "svg",
+  "fontName": "geek-icon",
+  "classNamePrefix": "geekicon", 
+  "linkMode": "inline",
+  "ext": "wxss"
+}
+  
