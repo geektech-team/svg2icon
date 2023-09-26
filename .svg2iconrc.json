@@ -5,6 +5,6 @@
   "fontName": "geek-icon",
   "classNamePrefix": "geekicon", 
   "linkMode": "inline",
-  "ext": "wxss"
+  "ext": "less"
 }
   
